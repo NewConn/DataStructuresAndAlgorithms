@@ -1,108 +1,219 @@
+#include "stdio.h"
+#include "stdlib.h"
+#include "malloc.h"
+#include "string.h"
+#define MAX 64
+#define FALSE 0
+#define TRUE 1
+int kuohao = 0;
 
-void Mid_post(char E[],char B[])   
+typedef  struct charsign
 {
-	int i=0,j=0;
-	char x; int a;
-	slink s=NULL;   
-	Clearstack(s);
-	Push(&s,'#');    
-	do
-	{	
-		x=B[i++];      //扫描当前表达式分量x 
-		switch(x)
-		{   
-		    case ' ':break; 
-		    case '#':
-			{
-				while(!Emptystack(s))
-				{
-				    E[j++]=' ';              //栈非空时
-					E[j++]=Pop(&s);
-				}
-			}break;
-		    case ')':
-			{
-				while(Getstop(s)!='(')
-				{
-				    E[j++]=' '; 
-					E[j++]=Pop(&s);
-				}                    //反复出栈直到遇到'(' 
-				Pop(&s);                //退掉'(' 
-			}break;
-			case '+':
-			case '-':
-			case '*':
-			case '/':
-			case '(':
-			{
-				while(Precede(Getstop(s),x))   //栈顶运算符（Q1）与x比较
-					{
-					    E[j++]=' ';
-				        E[j++]=Pop(&s);
-					}	
-				//E[j++]=' ';
-				Push(&s,x);          //Q1<x时，x进栈
-				E[j++]=' ';    
-				
-			}break; 
-			default:E[j++]=x;
-		}
-		
-	}while(x!='#'); 
-	E[j]='\0';
-	Clearstack(s);
+	char  data[MAX];   			
+  	int top;                      	
+}Stack,*LStack;
+
+typedef struct doublesta
+{
+	double data[MAX];
+	int top;
+}Nstack,*LNstack;
+
+int Push(LStack S,char x)
+{
+	if(S->top >= MAX - 1)
+		return FALSE;
+	S->top++;
+	S->data[S->top]=x;
+	return TRUE;
 }
-//后缀表达式求值
-float Ecount(char E[])  
+
+int Push2(LNstack S,double x)
 {
-	int i=0,k=0,d=0,d1,h;
-	float a1=0,a2,g=0,g1;
+	if(S->top >MAX-1)
+		return FALSE;
+	S->top++;
+	S->data[S->top]=x;
+	return TRUE;
+}
+
+char Pop(LStack S)
+{
 	char x;
-	float z,a,b;
-	slink1 s=NULL;
-	while(E[i]!='#')
-	{
-		x=E[i];
-		switch(x)
-		{
-			case ' ':break;
-			case '+':b=Pop1(&s);a=Pop1(&s);z=a+b;Push1(&s,z);break;
-			case '-':b=Pop1(&s);a=Pop1(&s);z=a-b;Push1(&s,z);break;
-			case '*':b=Pop1(&s);a=Pop1(&s);z=a*b;Push1(&s,z);break;
-			case '/':b=Pop1(&s);a=Pop1(&s);z=a/b;Push1(&s,z);break;	
-			default:
-			{
-			  g=0;g1=0;a1=0;a2=0;h=0;
-			  while(E[i]!=' ')
-			  {	
-				if(E[i] != '.')
-				{
-					g1 = E[i] - '0';  
-					g = g*10 + g1;
-					i++;
-				}
-				else
-				{
-					h=i;
-					i++;
-					while(E[i] != ' ')
-					{	
-						a2 = E[i]-'0';
-						for(int c=0;c<i-h;c++)
-						{
-							a2 = a2*(0.1);
-						}
-						a1 = a1 + a2;
-						i++;
-					}
-				}
-			  }
-			  g = g+a1;
-			  Push1(&s,g);  
-		    }
-		}
-		i++;
+	if(S->top==-1)
+		return ' ';
+	x=S->data[S->top];
+	S->top--;
+	return x;
+}
+
+double Pop2(LNstack S)
+{
+	double x;
+	if(S->top==-1)
+		return 0;
+	x=S->data[S->top];
+	S->top--;
+	return x;
+}
+
+int IsEmpty(LStack S)
+{												
+	return (S->top == -1);
 	}
-	if(!Emptystack1(s)) return(Getstop1(s));
-	Clearstack1(s);
+
+char GetTop(LStack S)
+{
+	if(S->top == -1)
+		return FALSE;
+	else{
+		return S->data[S->top];
+	}
+}
+int Priority(char x)
+{
+	switch(x)
+	{
+		case '+':return 1;break;
+		case '-':return 1;break;
+		case '*':return 2;break;
+		case '/':return 2;break;
+		default:return -1;break; 
+	}
+}
+
+double Count(double x,double y,char s)
+{
+	double c;
+	switch(s)
+	{
+		case '+':c=x+y;break;
+		case '-':c=x-y;break;
+		case '*':c=x*y;break;
+		case '/':c=x/y;break;
+		default :return 1000;
+	}
+	return c;
+}
+
+
+int IsSign(char x)
+{
+	switch(x)
+	{
+		case '+':return 1;break;
+		case '*':return 1;break;
+		case '/':return 1;break;
+		case '-':return 1;break;
+		default:return 0;break;
+	}
+}
+
+double PostCount(char posta[MAX])
+{
+	char 	*del=" ";									
+	char 	*p;													
+	double   N;													 
+	double	 test=0;
+	char 	 post[MAX];
+	strcpy(post,posta);
+	Nstack *num=(LNstack)malloc(sizeof(Nstack));
+	num->top=-1;
+	p=strtok(post,del);
+
+	do{
+		if(!IsSign(*p))
+		{
+			N=atof(p);
+			Push2(num,N);
+		}
+		else if(IsSign(*p))
+		{
+			test=Count(Pop2(num),Pop2(num),*p);					
+			Push2(num,test);
+		}
+		p=strtok(NULL,del);
+	}while(p);
+	return Pop2(num);
+}
+
+
+int main()
+{
+	int i=0,j=0,flag=1;
+	char mid[MAX];
+	char tmp[MAX]=" ";
+	Stack *sta=(LStack)malloc(sizeof(Stack));
+	sta->top=-1;
+	printf("Input a mid string");
+	gets(mid);
+	for(i=0;mid[i]!='\0';i++)
+	{
+		if(i!=0 && flag==1)
+			tmp[j++]=' ';							
+		flag=1;		
+		if(mid[i]==' ')
+		{
+			continue;
+		}
+		if(mid[i]>='0'&& mid[i]<='9')						
+		{
+			tmp[j++]=mid[i];
+			flag=0;   
+			continue;                              
+		}
+		if(mid[i]=='.')
+		{
+			tmp[j++]=mid[i];
+			flag=0;
+			continue;
+		}
+		if(mid[i]=='(')
+		{
+			kuohao++;
+			Push(sta,mid[i]);
+			continue;
+		}
+		if(mid[i]==')')
+		{
+			kuohao--;
+			while(GetTop(sta)!='(')
+			{
+				tmp[j++]=' ';
+				tmp[j++]=Pop(sta);
+			}	
+			Pop(sta);	
+			flag = 0;		
+			continue;
+		}
+		if(Priority(mid[i])>=Priority(sta->data[sta->top]))
+		{
+			Push(sta,mid[i]);					
+			continue;
+		}
+		if(Priority(mid[i]) < Priority(sta -> data[sta->top]))
+		{
+			do{
+				tmp[j++]=Pop(sta);
+			}while(IsEmpty(sta));					
+			Push(sta,mid[i]);
+			continue;
+		}											
+	}
+
+	if(kuohao!=0)
+	{
+		printf("�Ƿ�����!");
+		return 0;
+	}
+
+	while(!IsEmpty(sta))
+	{	
+		tmp[j++]=' ';		
+		tmp[j++]=Pop(sta);	
+	}
+	
+	printf("the mid expression is  %s \n",tmp);	
+	printf("the final result is %f \n",PostCount(tmp));
+	return 0;
 }
