@@ -4,38 +4,37 @@
 #include<ctype.h>
 #include<stdlib.h>
 #define WORDLEN 64                        
-#define KEYMAX 9973       
+#define KEYMAX 9973
 
- 
-typedef struct HashEle      											//å®šä¹‰ç»“æ„ä½“ï¼Œå½¢æˆé“¾è¡¨
+
+typedef struct HashEle      											//¶¨Òå½á¹¹Ìå£¬ĞÎ³ÉÁ´±í
 {  
     char word[WORDLEN];  
     int num;  
     struct HashEle* next;  
-}HashEle;  
-
+}HashEle;
 
 HashEle* HashForm[KEYMAX];    
 int TotalWord = 0;
 int SortNum = 0;
 
-
-
-unsigned int CalculateKey(const char* word)  							//è®¡ç®—é‡‡é›†åˆ°çš„æ–°å•è¯çš„å…³é”®ç å€¼
+unsigned int CalculateKey(const char* word)  							//¼ÆËã²É¼¯µ½µÄĞÂµ¥´ÊµÄ¹Ø¼üÂëÖµ
 {  
-    const signed char *p = (const signed char*)word;    				//å®šä¹‰ä¸´æ—¶æŒ‡é’ˆå¯¹å­—ç¬¦ä¸²è¿›è¡Œè®¡ç®—ï¼Œä»¥ä¿ç•™åŸå•è¯ä¿¡æ¯
+    const signed char *p = (const signed char*)word;    				//¶¨ÒåÁÙÊ±Ö¸Õë¶Ô×Ö·û´®½øĞĞ¼ÆËã£¬ÒÔ±£ÁôÔ­µ¥´ÊĞÅÏ¢
     unsigned int key = *p;  
     if(key)                                                
     {  
-        for(p += 1; *p != '\0'; ++p)                    				//å½“éå†åˆ°ç©ºå…ƒç´ ï¼Œå…³é”®ç å€¼çš„è®¡ç®—ç»“æŸ
-            key = (key << 5) - key + *p;       							//å®šä¹‰å“ˆå¸Œå‡½æ•°ï¼Œå°†å•è¯æ˜ å°„åˆ°æ•£åˆ—è¡¨é‡Œ
+        for(p += 1; *p != '\0'; ++p)                    				//µ±±éÀúµ½¿ÕÔªËØ£¬¹Ø¼üÂëÖµµÄ¼ÆËã½áÊø
+            key = (key << 5) - key + *p;       							//¶¨Òå¹şÏ£º¯Êı£¬½«µ¥´ÊÓ³Éäµ½É¢ÁĞ±íÀï
 		  key=key%KEYMAX;
     }  
-    return key;                                          				//è¿”å›è¯¥å•è¯å¯¹åº”çš„å…³é”®ç å€¼
+    return key;                                          				//·µ»Ø¸Ãµ¥´Ê¶ÔÓ¦µÄ¹Ø¼üÂëÖµ
 }  
+
 int PunctionAndNum(char x)
 {
-	switch(x){
+	switch(x)
+	{
 		case '_':return 1;
 		case ' ':return 0;
 		default :
@@ -44,65 +43,54 @@ int PunctionAndNum(char x)
 					return 1;
 				else 
 					return 0;
-				}
+			}
 	}
 }
 
 void InsertWord(const char* word)  
 {
- unsigned int place = CalculateKey(word);    							//è°ƒç”¨å…³é”®ç å€¼è®¡ç®—å‡½æ•°å¾—åˆ°å•è¯å¯¹åº”çš„å…³é”®ç å€¼
-     HashEle* p =  HashForm[place];       								//æ‰¾åˆ°è¯¥å…³é”®ç å€¼çš„é“¾è¡¨å¤´æŒ‡é’ˆåœ¨æ•°ç»„ä¸­çš„ä½ç½®ï¼Œå®šä¹‰ä¸´æ—¶æŒ‡é’ˆè¿›è¡Œéå†æ“ä½œ       
-    while(p)             												//éå†è¯¥å•è¯çš„å…³é”®ç å€¼å¯¹åº”çš„é“¾è¡¨ï¼Œçœ‹æ˜¯å¦æœ‰ç›¸åŒå•è¯
+ unsigned int place = CalculateKey(word);    							//µ÷ÓÃ¹Ø¼üÂëÖµ¼ÆËãº¯ÊıµÃµ½µ¥´Ê¶ÔÓ¦µÄ¹Ø¼üÂëÖµ
+     HashEle* p =  HashForm[place];       								//ÕÒµ½¸Ã¹Ø¼üÂëÖµµÄÁ´±íÍ·Ö¸ÕëÔÚÊı×éÖĞµÄÎ»ÖÃ£¬¶¨ÒåÁÙÊ±Ö¸Õë½øĞĞ±éÀú²Ù×÷       
+    while(p)             												//±éÀú¸Ãµ¥´ÊµÄ¹Ø¼üÂëÖµ¶ÔÓ¦µÄÁ´±í£¬¿´ÊÇ·ñÓĞÏàÍ¬µ¥´Ê
 	{  
-        if(strcmp(p->word, word) == 0)    								//å¦‚æœå¯¹åº”çš„å•è¯ç›¸åŒåˆ™è¯¥ç»“æ„ä½“çš„è®¡æ•°å˜é‡åŠ ä¸€
+        if(strcmp(p->word, word) == 0)    								//Èç¹û¶ÔÓ¦µÄµ¥´ÊÏàÍ¬Ôò¸Ã½á¹¹ÌåµÄ¼ÆÊı±äÁ¿¼ÓÒ»
         {  
             p->num++;
             return ;  
         }  
-        p = p->next;                     								//é‡åˆ°ç›¸åŒå•è¯å‰ç»§ç»­éå†
+        p = p->next;                     								//Óöµ½ÏàÍ¬µ¥´ÊÇ°¼ÌĞø±éÀú
     }  
-  
-    HashEle* NewEle = (HashEle*)malloc(sizeof(HashEle));  				//åœ¨è¯¥å…³é”®ç å€¼çš„é“¾è¡¨ä¸­æ²¡æœ‰æ‰¾åˆ°è¯¥å•è¯ï¼Œåˆ™å‡†å¤‡æ’å…¥
-    NewEle->num=1;                         								//æ–°è¡¨å…ƒè®¡æ•°å˜é‡ä¸º1
-    strcpy(NewEle->word, word);              							//ç»™æ–°è¡¨å…ƒçš„wordèµ‹å€¼
-    NewEle->next = HashForm[place];          							//å°†æ–°è¡¨å…ƒæ’å…¥åˆ°é“¾è¡¨çš„æœ€å‰é¢ï¼Œä½¿æ’å…¥æ“ä½œæœ€ç®€åŒ–
+    HashEle* NewEle = (HashEle*)malloc(sizeof(HashEle));  				//ÔÚ¸Ã¹Ø¼üÂëÖµµÄÁ´±íÖĞÃ»ÓĞÕÒµ½¸Ãµ¥´Ê£¬Ôò×¼±¸²åÈë
+    NewEle->num=1;                         								//ĞÂ±íÔª¼ÆÊı±äÁ¿Îª1
+    strcpy(NewEle->word, word);              							//¸øĞÂ±íÔªµÄword¸³Öµ
+    NewEle->next = HashForm[place];          							//½«ĞÂ±íÔª²åÈëµ½Á´±íµÄ×îÇ°Ãæ£¬Ê¹²åÈë²Ù×÷×î¼ò»¯
     HashForm[place] = NewEle;  
-    TotalWord++;                        								//å•è¯æ€»æ•°åŠ 1
-    
+    TotalWord++;                        								//µ¥´Ê×ÜÊı¼Ó1
 }
 
-int CompareNum(const void*a ,const void *b)            						//ä¸ºä¸»å‡½æ•°ä¸­è°ƒç”¨çš„qsortå¿«æ’å‡½æ•°å®šä¹‰æ¯”è¾ƒå‡½æ•°
+int CompareNum(const void*a ,const void *b)            						//ÎªÖ÷º¯ÊıÖĞµ÷ÓÃµÄqsort¿ìÅÅº¯Êı¶¨Òå±È½Ïº¯Êı
 {
-     struct HashEle **aa=(HashEle **)a;     							//å¼ºåˆ¶ç±»å‹è½¬æ¢ï¼Œå°†qsorté»˜è®¤çš„æ— ç±»å‹æŒ‡é’ˆè½¬æ¢ä¸ºç»“æ„ä½“æŒ‡é’ˆ
+     struct HashEle **aa=(HashEle **)a;     							//Ç¿ÖÆÀàĞÍ×ª»»£¬½«qsortÄ¬ÈÏµÄÎŞÀàĞÍÖ¸Õë×ª»»Îª½á¹¹ÌåÖ¸Õë
      struct HashEle **bb=(HashEle **)b;
-	 if(((*aa)->num)==((*bb)->num))                    					//å½“å•è¯å‡ºç°æ¬¡æ•°ç›¸ç­‰ï¼Œåˆ™æŒ‰å­—å…¸é¡ºåºè¿›è¡Œæ’åº
+	 if(((*aa)->num)==((*bb)->num))                    					//µ±µ¥´Ê³öÏÖ´ÎÊıÏàµÈ£¬Ôò°´×ÖµäË³Ğò½øĞĞÅÅĞò
 		 return(strcmp((*aa)->word,(*bb)->word)>0?1:-1);
 	 else
-		 return(((*aa)->num)>((*bb)->num)?1:-1);       					//å¦‚æœå•è¯å‡ºç°æ¬¡æ•°ä¸ç›¸ç­‰ï¼Œåˆ™æŒ‰å‡ºç°æ¬¡æ•°æ’åˆ—
+		 return(((*aa)->num)>((*bb)->num)?1:-1);       					//Èç¹ûµ¥´Ê³öÏÖ´ÎÊı²»ÏàµÈ£¬Ôò°´³öÏÖ´ÎÊıÅÅÁĞ
 }
 
 FILE *ReadFile()
 {
-	  
 	FILE *FilePath;
-	
 	char  FileName[40];  
-	
-	printf("please INPUT the name of the file you want to operate (ï½€-Â´)>ï¼š\n");
-	printf("INPUT here  (^o^)ä¸¿: ");
-	
+	printf("ÇëÊäÈëÎÄ¼şÃû£º\n");
 	scanf("%s",FileName);
-	
 	if((FilePath=fopen(FileName,"r"))==NULL)    
-	
 	{
-		printf("fail to open the file%s \n",FileName);
+		printf("´ò¿ª %s Ê§°Ü \n",FileName);
 		exit(0);
 	}
-	
 	return FilePath;
 }
-
 
 int BuildHash(FILE *FilePath)
 {
@@ -112,44 +100,37 @@ int BuildHash(FILE *FilePath)
 	char word[WORDLEN];
 	while((ch=fgetc(FilePath))!=EOF)
 	{	
-		
 		if( isalpha(ch)  ||  ((ch=='\'')  &&  (state==1)))     
 		{   
 			state=1;                                 
-			   if(ch>='A'&&ch<='Z')                       
-				   ch=ch+('a'-'A');
-				*(word+k)=ch;                             
-				k++;
+			  if(ch>='A'&&ch<='Z')                       
+				  ch=ch+('a'-'A');
+			*(word+k)=ch;                             
+			k++;
 		}
 		else if(!isalpha(ch)&&state==1)       
-		   {
-			  state=0;                
-			  *(word+k)='\0';
-	          InsertWord(word); 
-	                          
-			  k=0;
-		    }
+		{
+			state=0;                
+			*(word+k)='\0';
+			InsertWord(word); 
+			k=0;
+		}
 		else if(PunctionAndNum(ch) && (state == 0))
-			{
-				word[0]=ch;
-				*(word+1)='\0';
-				InsertWord(word);
-			}
-		
+		{
+			word[0]=ch;
+			*(word+1)='\0';
+			InsertWord(word);
+		}
 	}
-
-	printf("\n the hash table yet  ãƒ½(Â´ãƒ¼ï½€)ï¾‰\n");
+	//printf("\nhash±í½¨Á¢\n");
 	fclose(FilePath);	
 	return 0;
-	
 }
 
 HashEle	**SortHash(){
-	
 	int j=0,i=0;
-	HashEle *(*sort);        											//å®šä¹‰ä¸´æ—¶æŒ‡é’ˆæ•°ç»„ç”¨äºå­˜æ”¾æ‰€æœ‰éé‡å¤å•è¯ï¼Œä¾¿äºä¸‹ä¸€æ­¥çš„æ’åº
+	HashEle *(*sort);        											//¶¨ÒåÁÙÊ±Ö¸ÕëÊı×éÓÃÓÚ´æ·ÅËùÓĞ·ÇÖØ¸´µ¥´Ê£¬±ãÓÚÏÂÒ»²½µÄÅÅĞò
 	sort=(HashEle **)calloc(TotalWord,sizeof(HashEle **));
-
 	for(i = 0; i < KEYMAX; ++i)  
       {
 		  if(HashForm[i])  
@@ -163,92 +144,67 @@ HashEle	**SortHash(){
             }  
         }  
 	}
-	
-	
 	SortNum=j;
 	qsort(sort,SortNum,sizeof(sort[0]),CompareNum);
-	
 	return sort;
 }
-
 void WriteFile(HashEle *(*sort)){
-	
 	FILE *FilePath;
 	int i=0;
-	
 	char  FileName[40];  
-	 printf("we will output the wordlist , \nplease INPUT the  name of the file here  (ï¿£â–½ï¿£)â•¯ : ");
+	printf("ÇëÊäÈëÍ³¼Æ½á¹û±£´æµÄÎÄ¼şÃû:\n");
 	scanf("%s",FileName);
 	FilePath=fopen(FileName,"w");                        
 	if(FilePath==NULL)                    
 		{
-			printf("fail to establish the result file,try again /n ï¼ˆâ”´â€”â”´ç¿»æ¡Œå•¦!46.ç¿»æ¡Œå•¦!â”´â€”â”´ï¼ˆâ•°(â€˜â–¡â€²â•°)\n");
+			printf("ÎŞ·¨´´½¨Í³¼Æ½á¹ûÎÄ¼ş£¬ÇëÖØÊÔ£¡\n");
 			FilePath=fopen(FileName,"w");  
 		}
-	else
-		printf("Established,and wait Oh, It seems we don't need wait ãƒ½(Ë‹â–½ËŠ)ãƒ \n");
 	for(i=0;i<SortNum;i++)           
 	{
 	    fprintf(FilePath,"%-18s:\t",sort[i]->word);
 		fprintf(FilePath,"%d\n",sort[i]->num);
 	}
-	printf("\n we have written a word list ã„Ÿ(â–”,â–”)ã„v\n");
-	
-
-	
+	printf("Í³¼Æ³É¹¦\n");
 	fclose(FilePath); 
-
 }
+
 void TopTen(HashEle *(*sort)){
-	
 	FILE *FilePath;
 	int i=0,j=0;
-
 	char  FileName[40];  
-	
-	printf("\n\nOUTPUT the TOP 10 word list  , \n  INPUT the  name of the file here \(â–”ï¼¾â–”)/ : ");
-	
+	printf("\nÊä³ö´ÎÊı×î¶àµÄ10¸öµ¥´Ê,\nÇëÊäÈëÎÄ¼şÃû: ");
 	scanf("%s",FileName);
-	
 	FilePath=fopen(FileName,"w");    
-	                    
 	if(FilePath==NULL)                    
 		{
-			printf("fail to establish the result file,try again (ï¼ï¹ï¼œ) \n");
+			printf("ÎŞ·¨´´½¨Í³¼Æ½á¹ûÎÄ¼ş£¬ÇëÖØÊÔ£¡\n");
 			scanf("%s%*c",FileName);
 			FilePath=fopen(FileName,"w");  
 		}
 	else
-	
-		printf("Successfully Established \\(â–”â–½â–”)/ \n");
-		
+		printf("Í³¼Æ³É¹¦£¡\n");
 	for(i=SortNum-1,j=0;j<10;i--,j++)           
 	{
 	    fprintf(FilePath,"%-18s:\t",sort[i]->word);
 		fprintf(FilePath,"%d\n",sort[i]->num);
 	}
-	printf("\n Write  Finished \\^_^/ \n");
-	
-	
-	
+	printf("\nĞ´ÈëÍê³É\n");
 	fclose(FilePath); 
-
 }
-	
 void FindWord()
 {
 	char word[40];
 	int flagY = 0;
 	int tag = 0;
 	do{
-		
-		printf("\n INPUT (â•¯â–”ï¼¾â–”)â•¯  0   to Find THE WORD, INPUT 1 ã„Ÿ(â–”â–½â–”ã„Ÿ) to exit this part \n");
-			scanf("%d",&flagY);
-			if(flagY==0)
-			{
-				printf("Now, you can INPUT the word\n the word you want to find is: \t");
-				scanf("%s",word);
-				CalculateKey(word);
+		printf("ÊäÈë0²éÕÒµ¥´Ê£¬ÊäÈë1ÍË³ö²éÕÒµ¥´Ê\n");
+		scanf("%d",&flagY);
+		if(flagY==0)
+		{
+			printf("ÇëÊäÈë²éÕÒµÄµ¥´Ê£º");
+			scanf("%s",word);
+			CalculateKey(word);
 				unsigned int place = CalculateKey(word);    
 				HashEle* p =  HashForm[place];        
 				while(p)          
@@ -256,62 +212,37 @@ void FindWord()
 					if(strcmp(p->word, word) == 0)    
 						{  
 							tag = 1;
-							printf("\nFind word successfully ! \n The word in the word list showed as below: \n word: â†’_â†’  \" %s \"\tcountNum: \" %d \"ãƒ½(Ë‹Ğ”ËŠ )ãƒ\n",word,p->num); 
+							printf("\nÕÒµ½µ¥´Ê%s£¬³öÏÖÁË%d´Î\n",word,p->num); 
 						}  
-					 
-					
 						p = p->next;   
-						                  
 				}
-				
 				if(tag == 0)
 				{
-					printf("\nNO THIS WORD\n");
+					printf("\nÃ»ÓĞÕÒµ½\n");
 					tag = 0;
 				}
 			}  
-				
 	}while(flagY == 0);
-
 }		
-
 int main()
 {   
-	FILE *FilePath;   													//å®šä¹‰è¾“å…¥æ–‡ä»¶çš„æŒ‡é’ˆ
-      
+	FILE *FilePath;   													//¶¨ÒåÊäÈëÎÄ¼şµÄÖ¸Õë
 	int flagX=0;
-
-	HashEle *(*sort);        											//å®šä¹‰ä¸´æ—¶æŒ‡é’ˆæ•°ç»„ç”¨äºå­˜æ”¾æ‰€æœ‰éé‡å¤å•è¯ï¼Œä¾¿äºä¸‹ä¸€æ­¥çš„æ’åº
-
+	HashEle *(*sort);        											//¶¨ÒåÁÙÊ±Ö¸ÕëÊı×éÓÃÓÚ´æ·ÅËùÓĞ·ÇÖØ¸´µ¥´Ê£¬±ãÓÚÏÂÒ»²½µÄÅÅĞò
 	do{
-		
 		FilePath=ReadFile();
-		
 		BuildHash(FilePath);
-		
 		sort= SortHash();
-		
 		WriteFile(sort);
-		
 		TopTen(sort);
-		
-		
 		FindWord();
-		
-		printf("INPUT 1 to exit,0 to continue\n");
+		printf("ÊäÈë0¼ÌĞø£¬ÊäÈë1ÍË³ö³ÌĞò\n");
 		scanf("%d",&flagX);
-		
-		
 		free(*sort);
 		free(sort);
 		sort=NULL;
-		
 		SortNum = 0;
 		TotalWord = 0;
-		
 	}while(flagX == 0);   
-
-	printf("\n \n Powered by @Aaron, Bye~\n");
-	
 	return 0;
 }
