@@ -5,7 +5,7 @@
 #include<stdlib.h>
 #define WORDLEN 64                        
 #define KEYMAX 9973
-
+#include <windows.h>
 
 typedef struct HashEle      											//定义结构体，形成链表
 {
@@ -82,7 +82,7 @@ FILE *ReadFile()
 {
 	FILE *FilePath;
 	char  FileName[40];
-	printf("请输入文件名：\n");
+	printf("\n请输入文件名：\n");
 	scanf("%s", FileName);
 	if ((FilePath = fopen(FileName, "r")) == NULL)
 	{
@@ -122,14 +122,13 @@ int BuildHash(FILE *FilePath)
 			InsertWord(word);
 		}
 	}
-	//printf("\nhash表建立\n");
 	fclose(FilePath);
 	return 0;
 }
 
 HashEle	**SortHash() {
 	int j = 0, i = 0;
-	HashEle *(*sort);        											//定义临时指针数组用于存放所有非重复单词，便于下一步的排序
+	HashEle *(*sort);        												//定义临时指针数组用于存放所有非重复单词，便于下一步的排序
 	sort = (HashEle **)calloc(TotalWord, sizeof(HashEle **));
 	for (i = 0; i < KEYMAX; ++i)
 	{
@@ -150,103 +149,58 @@ HashEle	**SortHash() {
 }
 void WriteFile(HashEle *(*sort)) {
 	FILE *FilePath;
-	int i = 0;
-	//统计结果写入文件
-	char  FileName[40] = "jieguo.txt";
-	//printf("请输入统计结果保存的文件名:\n");
-	//scanf("%s", FileName);
-
+	int i = 0;																									//统计结果写入文件
+	char  FileName[40] = "统计结果.txt";
 	FilePath = fopen(FileName, "w");
-	/*if (FilePath == NULL)
-	{
-		printf("无法创建统计结果文件，请重试！\n");
-		FilePath = fopen(FileName, "w");
-	}
-	*/
 	for (i = 0; i<SortNum; i++)
 	{
 		fprintf(FilePath, "%-18s:\t", sort[i]->word);
 		fprintf(FilePath, "%d\n", sort[i]->num);
 	}
-	printf("统计成功\n");
+	printf("\n统计成功，统计结果已写入”统计结果.txt“\n");
 	fclose(FilePath);
-	/*统计结果输出
-	for (i = 0; i<SortNum; i++)
-	{
-		printf("%-18s:\t",sort[i]->word);
-		printf("%d\n", sort[i]->num);
-	}*/
 }
 
 void TopTen(HashEle *(*sort))
 {
 	int i = 0, j = 0;
-	printf("\n出现次数最多的10个单词：\n ");
-	/*次数最多的10个单词写入文件
-	FILE *FilePath;
-	char  FileName[40];
-	
-	scanf("%s", FileName);
-	FilePath = fopen(FileName, "w");
-	if (FilePath == NULL)
-	{
-		printf("无法创建统计结果文件，请重试！\n");
-		scanf("%s%*c", FileName);
-		FilePath = fopen(FileName, "w");
-	}
-	else
-		printf("统计成功！\n");
-	for (i = SortNum - 1, j = 0; j<10; i--, j++)
-	{
-		fprintf(FilePath, "%-18s:\t", sort[i]->word);
-		fprintf(FilePath, "%d\n", sort[i]->num);
-	}
-	printf("\n写入完成\n");
-	fclose(FilePath);
-	*/
+	printf("\n出现次数最多的10个单词：\n");
 	for (i = SortNum - 1, j = 0; j<10; i--, j++)
 	{
 		printf("%-18s:\t", sort[i]->word);
 		printf("%d\n", sort[i]->num);
 	}
 }
+
 void FindWord()
 {
 	char word[40];
-	int flagY = 0;
 	int tag = 0;
-	do {
-		printf("输入0查找单词，输入1退出查找单词\n");
-		scanf("%d", &flagY);
-		if (flagY == 0)
+	printf("请输入查找的单词：");
+	scanf("%s", word);
+	CalculateKey(word);
+	unsigned int place = CalculateKey(word);
+	HashEle* p = HashForm[place];
+	while (p)
+	{
+		if (strcmp(p->word, word) == 0)
 		{
-			printf("请输入查找的单词：");
-			scanf("%s", word);
-			CalculateKey(word);
-			unsigned int place = CalculateKey(word);
-			HashEle* p = HashForm[place];
-			while (p)
-			{
-				if (strcmp(p->word, word) == 0)
-				{
-					tag = 1;
-					printf("\n找到单词%s，出现了%d次\n", word, p->num);
-				}
-				p = p->next;
-			}
-			if (tag == 0)
-			{
-				printf("\n没有找到\n");
-				tag = 0;
-			}
+			tag = 1;
+			printf("\n找到单词%s，出现了%d次\n", word, p->num);
 		}
-	} while (flagY == 0);
-}
+		p = p->next;
+	}
+	if (tag == 0)
+	{
+		printf("\n没有找到\n");
+		tag = 0;
+	}
+} 
 
 void lastTimes()
 {
 	FILE *FilePath;
-	char  FileName[40] = "jieguo.txt";
+	char  FileName[40] = "统计结果.txt";
 	if (FilePath = fopen(FileName, "r"))
 	{
 		char c;
@@ -258,26 +212,44 @@ void lastTimes()
 		fclose(FilePath);
 	}
 }
+
 int main()
 {
 	FILE *FilePath;   													//定义输入文件的指针
 	int flagX = 0;
+	int flagY = 0;
 	HashEle *(*sort);        											//定义临时指针数组用于存放所有非重复单词，便于下一步的排序
-	do {
-		lastTimes();
-		FilePath = ReadFile();
-		BuildHash(FilePath);
-		sort = SortHash();
-		WriteFile(sort);
-		TopTen(sort);
-		FindWord();
-		printf("输入0继续，输入1退出程序\n");
-		scanf("%d", &flagX);
+	lastTimes();
+	FilePath = ReadFile();
+	BuildHash(FilePath);
+	sort = SortHash();
+	WriteFile(sort);
+	TopTen(sort);
+	while (1)
+	{
+		printf("\n输入0退出程序，输入1查找单词，输入2追加统计，输入3初始化程序\n");
+		scanf("%d", &flagY);
+		if (flagY == 0){
+			return 0;
+		}
+		if (flagY == 1){				//查找单词
+			FindWord();
+		}
+		if (flagY == 2){				//追加统计
+			FilePath = ReadFile();
+			BuildHash(FilePath);
+			sort = SortHash();
+			WriteFile(sort);
+			TopTen(sort);
+		}
+		if (flagY == 3){				//初始化程序
+			remove("统计结果.txt");
+		}
+	}
 		free(*sort);
 		free(sort);
 		sort = NULL;
 		SortNum = 0;
 		TotalWord = 0;
-	} while (flagX == 0);
 	return 0;
 }
